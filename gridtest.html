@@ -2,6 +2,36 @@
   <head>
     <script>
       var testData = [];
+      
+      var loadTemplate = function(url) {
+        var templateHolder = document.createElement('script');
+          !!document.body? document.body.appendChild(templateHolder)
+                         : document.addEventListener('DOMContentLoaded', function(e) { document.body.appendChild(templateHolder); });
+        
+        templateHolder.setAttribute('type', 'text/x-template');
+        templateHolder.setAttribute('id', generateID());
+        
+        $.get(url, function(data) {
+          console.log(data);
+          templateHolder.innerHTML = data;
+        }, 'text');
+        
+        return '#' + templateHolder.id;
+      }
+      
+      var generateUUID = function() {
+          var d = new Date().getTime();
+          var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+              var r = (d + Math.random()*16)%16 | 0;
+              d = Math.floor(d/16);
+              return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+          });
+          return uuid;
+      };
+      
+      var generateID = function() {
+        return 'template' + (new Date()).valueOf();
+      }
     </script>
     <style>
       body {
@@ -28,10 +58,13 @@
 
       td {
         background-color: #f9f9f9;
+        overflow-y: hidden;
+        text-overflow: ellipsis;
+        transform: rotateZ(0.1deg);
+        height:24px;
       }
 
       th, td {
-        min-width: 120px;
         padding: 1px 2px;
       }
 
@@ -68,8 +101,9 @@
     <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/vue@2.1.10/dist/vue.js"></script>
     <script>
+      //loadTemplate('./templates/grid.vue');
       Vue.component('demo-grid', {
-        template: '#grid-template',
+        template: loadTemplate('./templates/grid.vue'),//;'#grid-template',
         props: {
           data: Array,
           columns: Array,
@@ -81,7 +115,7 @@
             var $this = this;
             
             var ret = this.data.filter(function(v, i) { return v.n01>=50; })
-                            .filter(function(v, i) { return i>=$this.rowIndex && i<$this.rowIndex+30; });
+                            .filter(function(v, i) { return i>=$this.rowIndex && i<$this.rowIndex+10; });
             return ret;
           }
         },
@@ -91,7 +125,11 @@
             this.sortOrders[k] = this.sortOrders[k] * -1;
           },
           scroll: function(e) {
-            console.log('하하');
+          //  e.preventDefault();
+          //  e.stopPropagation();
+            //console.log(demo.gridIndex, e.deltaX, e.deltaY, e.deltaZ);
+            demo.gridIndex += e.deltaY/24;
+            if(demo.gridIndex<0) demo.gridIndex = 0;
           }
         }
       });
@@ -100,26 +138,24 @@
   <body>
     <!--components-->
     <script type="text/x-template" id="grid-template">
-      <div @scroll="scroll" style="width:100%; height:100%;">
-        <table>
-          <thead>
-            <tr>
-              <th v-for="k in columns">
-                {{k}}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="e in filteredData">
-              <td v-for="k in columns">
-                <span v-if="k[0]=='n' && e[k]>90" style="color:#f00;">{{e[k]}}</span>
-                <span v-else-if="k[0]=='n' && e[k]>70" style="color:#aa0;">{{e[k]}}</span>
-                <span v-else>{{e[k]}}</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <table @wheel.prevent="scroll">
+  <thead>
+    <tr>
+      <th v-for="k in columns">
+        {{k}}
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="e in filteredData">
+      <td v-for="k in columns">
+        <span v-if="k[0]=='n' && e[k]>90" style="color:#f00;">{{e[k]}}</span>
+        <span v-else-if="k[0]=='n' && e[k]>70" style="color:#aa0;">{{e[k]}}</span>
+        <span v-else>{{e[k]}}</span>
+      </td>
+    </tr>
+  </tbody>
+</table>
     </script>
     <!--components-->
 
@@ -153,7 +189,7 @@
         },
         mounted() {
           loadData();
-          setInterval(function() { demo.gridIndex++; if(demo.gridIndex>=demo.gridData.length) demo.gridIndex = 0; }, 100);
+          //setInterval(function() { demo.gridIndex++; if(demo.gridIndex>=demo.gridData.length) demo.gridIndex = 0; }, 67);
         }
       });
 
