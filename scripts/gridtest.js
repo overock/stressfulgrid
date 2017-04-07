@@ -11,25 +11,23 @@ document.addEventListener('DOMContentLoaded', function() {
     computed: {
       filteredData: function() {
         console.log('filteredData computed');
-        var $this = this;
         return this.data.filter(function(v, i) { return v.n01>=50; });
       },
       windowed: function() {
         console.log('windowed computed');
-        var $this = this;
-        return this.filteredData.filter(function(v, i) { return i>=$this.rowIndex && i<$this.rowIndex+30; });
+        return this.filteredData.filter(function(v, i) { return i>=this.rowIndex && i<this.rowIndex+30; }, this);
       },
       summary: function() {
         console.log('summary computed');
-        var $this = this, __LENGTH__ = 50;
+        var __LENGTH__ = 50;
         return this.filteredData.reduce(function(p, c) {
           for(var i=0; i<__LENGTH__; i++) {
             p[i] += c[i<9? 'n0' + (i+1) : 'n' + (i+1)];
           }
           return p;
         }, new Array(__LENGTH__).fill(0)).map(function(v, i) {
-          return (v/$this.filteredData.length).toFixed(1);
-        });
+          return (v/this.filteredData.length).toFixed(1);
+        }, this);
       }
     },
     methods: {
