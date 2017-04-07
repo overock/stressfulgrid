@@ -17,9 +17,8 @@
   </tbody>
   <tfoot>
     <tr>
-      <td v-for="v in columns">
-        
-      </td>
+      <td colspan="6">avg</td>
+      <td v-for="i in 10">{{summary[i-1]}}</td>
     </tr>
   </tfoot>
 </table>
