@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     computed: {
       filteredData: function() {
         console.log('filteredData computed');
-        return this.data.filter(function(v, i) { return v.n01>=50; });
+        return this.data.filter(function(v, i) { return v.n01>40 && v.n02>30 && v.n03>20 && v.n04>10; });
       },
       windowed: function() {
         console.log('windowed computed');
@@ -36,8 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
         this.sortOrders[k] = this.sortOrders[k] * -1;
       },
       scroll: function(e) {
-        demo.gridIndex += e.deltaY/24;
-        if(demo.gridIndex<0) demo.gridIndex = 0;
+        this.rowIndex = Math.min(Math.max(this.rowIndex+e.deltaY/24, 0), this.filteredData.length-30);
       }
     }
   });
@@ -68,8 +67,8 @@ var loadIndex = 0, testData = [], loadData = function() {
   var startDate = new Date();
   $.get('./d/' + (loadIndex++%10) + '.json', function(data) {
     Array.prototype.push.apply(testData, data);
-    testData.shift();
-    if(testData.length>=100000) testData.splice(0, 13333);
+    testData.length>=100000? testData.splice(0, 13333): testData.splice(0, 3333);
+    
 
     console.log('fetch complete. elapsed time: ' + (new Date() - startDate));
 
