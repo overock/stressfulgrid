@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     computed: {
       filteredData: function() {
         console.log('filteredData computed');
-        return this.data.filter(function(v, i) { return v.n01>40 && v.n02>30 && v.n03>20 && v.n04>10; });
+        return this.data.filter(function(v, i) { return v.n01>90 && v.n02>50 && v.n03>40 && v.n04>30; });
       },
       windowed: function() {
         console.log('windowed computed');
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
     props: { data: Object },
     methods: {
       at: function(i) { return this.data[(i<10? 'n0' : 'n') + i]; },
-      hsl: function(i) { return 'hsl(' + (200 - this.at(i)*2) + ', 100%, 50%)'; }
+      hsl: function(i) { return 'hsl(' + (250 - this.at(i)*2.5) + ', 100%, 50%)'; }
     }
   });
    
