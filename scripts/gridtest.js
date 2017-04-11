@@ -19,15 +19,21 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       summary: function() {
         console.log('summary computed');
-        var __LENGTH__ = 50;
-        return this.filteredData.reduce(function(p, c) {
-          for(var i=0; i<__LENGTH__; i++) {
-            p[i] += c[i<9? 'n0' + (i+1) : 'n' + (i+1)];
-          }
+        var keys = ['n01','n02','n03','n04','n05','n06','n07','n08','n09','n10',
+                    'n11','n12','n13','n14','n15','n16','n17','n18','n19','n20',
+                    'n21','n22','n23','n24','n25','n26','n27','n28','n29','n30',
+                    'n31','n32','n33','n34','n35','n36','n37','n38','n39','n40',
+                    'n41','n42','n43','n44','n45','n46','n47','n48','n49','n50'];
+        var sum = this.filteredData.reduce(function(p, c) {
+          keys.forEach(function(k) { p[k] = (p[k]|0) + c[k]; });
           return p;
-        }, new Array(__LENGTH__).fill(0)).map(function(v, i) {
-          return (v/this.filteredData.length).toFixed(1);
+        }, {});
+        
+        keys.forEach(function(k) {
+          sum[k] /= this.filteredData.length;
         }, this);
+        
+        return sum;
       }
     },
     methods: {
@@ -40,20 +46,23 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   });
+  
+  Vue.component('demo-bar', {
+    template: templer('./templates/barchart.vue'),
+    props: { data: Object },
+    methods: {
+      at: function(i) { return this.data[(i<10? 'n0' : 'n') + i]; },
+      hsl: function(i) { return 'hsl(' + (200 - this.at(i)*2) + ', 100%, 50%)'; }
+    }
+  });
    
   var demo = new Vue({
     el: '#demo',
     data: {
       searchQuery: '',
       gridData: testData,
-//      gridColumn: [ 'lastName','firstName','address','zipCode','email','phone','company','catchPhrase','signature',
-//                    'n01','n02','n03','n04','n05','n06','n07','n08','n09','n10',
-//                    'n11','n12','n13','n14','n15','n16','n17','n18','n19','n20',
-//                    'n21','n22','n23','n24','n25','n26','n27','n28','n29','n30',
-//                    'n31','n32','n33','n34','n35','n36','n37','n38','n39','n40',
-//                    'n41','n42','n43','n44','n45','n46','n47','n48','n49','n50' ],
-      gridColumn: [ 'lastName','firstName', 'zipCode','email','phone','company', 'n01','n02','n03','n04','n05','n06','n07','n08','n09','n10' ],
-      gridWidths: [ 100, 100, 100, 300, 200, 300, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40],
+      gridColumn: [ 'lastName','firstName', 'zipCode','email','phone','company', 'chart' ],
+      gridWidths: [ 100, 100, 100, 300, 200, 320, 510],
       gridIndex: 0
     },
     mounted() {
